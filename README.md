@@ -1,0 +1,15 @@
+# temp-humid-sensor-pico-w
+
+## About
+
+This is a micropython script for the raspberry pi pico w in use with a HDC1080 sensor. If you send a http request to the raspberry pi pico will you receive the current temperature and humidity read by the sensor.
+
+## How to use
+
+1. Upload [my HDC1080 library](https://github.com/SturmEnte/hdc1080-raspberry-pi-pico) to the pico
+2. Upload a Python file called "secrets.py" with a variable called "SSID" containing the wifi's ssid and a variable called "PASSWORD" containing the wifi's password
+3. Upload main.py from this repository to the pico
+
+## Wifi connection
+
+If the pico is not connected to the wifi will the onboard led be activated. If it disconnects from the wifi will it try to reconnect to the wifi until it reconnects
