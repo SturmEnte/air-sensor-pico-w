@@ -79,19 +79,19 @@ while True:
         print("Request from: ", addr)
         request = cl.recv(1024)
         
-        #try:
-        data = sensor.readSensor()
-        raw_temp = data[0]
-        raw_humid = data[1]
-        absolute_humid = absolute_from_relative_humidity(raw_temp, raw_humid)
-        corrected_temp = data[0] + secrets.TEMP_CORRECTION
-        corrected_humid = relative_from_absolute_humidity(corrected_temp, absolute_humid)
-        cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n")
-        cl.send("{\"raw_temperature\":%s, \"raw_relative_humidity\":%s, \"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s,}" % (raw_temp, raw_humid, corrected_temp, corrected_humid, absolute_humid))
+        try:
+            data = sensor.readSensor()
+            raw_temp = data[0]
+            raw_humid = data[1]
+            absolute_humid = absolute_from_relative_humidity(raw_temp, raw_humid)
+            corrected_temp = data[0] + TEMP_CORRECTION
+            corrected_humid = relative_from_absolute_humidity(corrected_temp, absolute_humid)
+            cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n")
+            cl.send("{\"raw_temperature\":%s, \"raw_relative_humidity\":%s, \"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s,}" % (raw_temp, raw_humid, corrected_temp, corrected_humid, absolute_humid))
     
-        #except:
-            #cl.send("HTTP/1.0 500 Internal Server Error\r\nContent-type: application/json\r\n\r\n")
-            #cl.send("{\"error\":\"Error while reading sensor data\"}")
+        except:
+            cl.send("HTTP/1.0 500 Internal Server Error\r\nContent-type: application/json\r\n\r\n")
+            cl.send("{\"error\":\"Error while reading sensor data\"}")
         
         cl.close()
         
