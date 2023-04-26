@@ -8,6 +8,13 @@ import socket
 import json
 import math
 
+TEMP_CORRECTION = 0
+
+try:
+    TEMP_CORRECTION = secrets.TEMP_CORRECTION
+except:
+    print("No temperature correction found")
+
 led = machine.Pin('LED', machine.Pin.OUT)
 led.on()
     
