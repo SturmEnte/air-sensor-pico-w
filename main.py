@@ -6,11 +6,21 @@ import secrets
 import time
 import socket
 import json
+import math
 
 led = machine.Pin('LED', machine.Pin.OUT)
 led.on()
     
 sensor = HDC1080(I2C(1, sda=Pin(26), scl=Pin(27)))
+
+# This formula is not 100% correct because it is not using the air pressure
+# https://carnotcycle.wordpress.com/2012/08/04/how-to-convert-relative-humidity-to-absolute-humidity/
+def absolute_from_relative_humidity(temp, rel_humid):
+    return (6.112 * math.pow(math.e, (17.67 * temp)/(temp+243.5)) * rel_humid * 2.1674) / (273.15 + temp)
+
+# 
+def relative_from_absolute_humidity(temp, abs_humid):
+    return (abs_humid * (273.15 + temp)) / ( 13.2471 * math.pow(math.e, (17.67 * temp)/(temp+243.5)))
 
 def connect_to_wifi():
     wlan.connect(secrets.SSID, secrets.PASSWORD)
@@ -62,14 +72,19 @@ while True:
         print("Request from: ", addr)
         request = cl.recv(1024)
         
-        try:
-            data = sensor.readSensor()
-            cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n")
-            cl.send("{\"temperature\":%s, \"humidity\":%s}" % (data[0], data[1]))
+        #try:
+        data = sensor.readSensor()
+        raw_temp = data[0]
+        raw_humid = data[1]
+        absolute_humid = absolute_from_relative_humidity(raw_temp, raw_humid)
+        corrected_temp = data[0] + secrets.TEMP_CORRECTION
+        corrected_humid = relative_from_absolute_humidity(corrected_temp, absolute_humid)
+        cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n")
+        cl.send("{\"raw_temperature\":%s, \"raw_relative_humidity\":%s, \"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s,}" % (raw_temp, raw_humid, corrected_temp, corrected_humid, absolute_humid))
     
-        except:
-            cl.send("HTTP/1.0 500 Internal Server Error\r\nContent-type: application/json\r\n\r\n")
-            cl.send("{\"error\":\"Error while reading sensor data\"}")
+        #except:
+            #cl.send("HTTP/1.0 500 Internal Server Error\r\nContent-type: application/json\r\n\r\n")
+            #cl.send("{\"error\":\"Error while reading sensor data\"}")
         
         cl.close()
         
