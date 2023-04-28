@@ -104,7 +104,7 @@ while True:
     except:
         print("Failed to read data or to display it on the screen")
     
-    s.settimeout(10)
+    s.settimeout(60)
     try:
         cl, addr = s.accept()
         print("Request from: ", addr)
