@@ -8,6 +8,7 @@ import time
 import socket
 import json
 import math
+import ubinascii
 
 TEMP_CORRECTION = 0
 
@@ -38,7 +39,6 @@ def readSensor():
 def absolute_from_relative_humidity(temp, rel_humid):
     return (6.112 * math.pow(math.e, (17.67 * temp)/(temp+243.5)) * rel_humid * 2.1674) / (273.15 + temp)
 
-# 
 def relative_from_absolute_humidity(temp, abs_humid):
     return (abs_humid * (273.15 + temp)) / ( 13.2471 * math.pow(math.e, (17.67 * temp)/(temp+243.5)))
 
@@ -98,9 +98,9 @@ while True:
         display.text('%', 50, 10, 1)
         display.text(str(round(data[2], 2)), 0, 20, 1)
         display.text('g/m3', 50, 20, 1)
+        display.text(wlan.ifconfig()[0], 0, 55, 1)
         display.show()
-    
-        display.show()
+        
     except:
         print("Failed to read data or to display it on the screen")
     
@@ -113,7 +113,7 @@ while True:
         try:
             data = readSensor()
             cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n")
-            cl.send("{\"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s,}" % (data[0], data[1], data[2]))
+            cl.send("{\"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s}" % (data[0], data[1], data[2]))
     
         except:
             cl.send("HTTP/1.0 500 Internal Server Error\r\nContent-type: application/json\r\n\r\n")
