@@ -64,18 +64,15 @@ def check_wifi():
         while not wlan.isconnected():
             connect_to_wifi()
         print("Reconnected to the wifi")
-        print( 'Ip = ' + wlan.ifconfig()[0] )
+        print('Ip: ' + wlan.ifconfig()[0])
+        print('Mac: ' + mac = ubinascii.hexlify(network.WLAN().config('mac'), ':').decode())
         led.off()
+    else:
+        print( 'Ip = ' + wlan.ifconfig()[0] )
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-connect_to_wifi()
-
-if wlan.isconnected():
-    while not wlan.isconnected():
-        connect_to_wifi()
-    print("Connected to wifi")
-    led.off()
+check_wifi()
 
 addr = socket.getaddrinfo("0.0.0.0", 80)[0][-1]
 
@@ -88,7 +85,7 @@ while True:
     
     try:
         data = readSensor()
-    
+
         display.sleep(False)
         display.fill(0)
 
