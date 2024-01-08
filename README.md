@@ -1,4 +1,4 @@
-# temp-humid-sensor-pico-w
+# air-sensor-pico-w
 
 ## About
 
