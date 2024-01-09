@@ -1,7 +1,5 @@
 from machine import Pin, I2C
 import utime as time
-from HDC1080 import HDC1080
-import sh1106
 import network
 import secrets
 import time
@@ -9,6 +7,10 @@ import socket
 import json
 import math
 import ubinascii
+
+import sh1106
+from HDC1080 import HDC1080
+import CCS811
 
 TEMP_CORRECTION = 0
 
@@ -22,17 +24,27 @@ led.on()
 
 i2c = I2C(1, sda=Pin(26), scl=Pin(27))
 
-sensor = HDC1080(i2c)
-display = sh1106.SH1106_I2C(128, 64, i2c, machine.Pin(2), 0x3c)
+print(i2c.scan())
 
-def readSensor():
-    data = sensor.readSensor()
+temp_humid_sensor = HDC1080(i2c)
+ccs811_sensor = CCS811.CCS811(i2c=i2c, addr=90)
+#display = sh1106.SH1106_I2C(128, 64, i2c, machine.Pin(2), 0x3c)
+
+def readTempHumidSensor():
+    data = temp_humid_sensor.readSensor()
     raw_temp = data[0]
     raw_humid = data[1]
     absolute_humid = absolute_from_relative_humidity(raw_temp, raw_humid)
     corrected_temp = data[0] + TEMP_CORRECTION
     corrected_humid = relative_from_absolute_humidity(corrected_temp, absolute_humid)
     return (corrected_temp, corrected_humid, absolute_humid)
+
+def readCCS811():
+    while not ccs811_sensor.data_ready():
+        print("Waiting for ccs811 sensor data...")
+    return (ccs811_sensor.eCO2, ccs811_sensor.tVOC)
+
+print(readCCS811())
 
 # This formula is not 100% correct because it is not using the air pressure
 # https://carnotcycle.wordpress.com/2012/08/04/how-to-convert-relative-humidity-to-absolute-humidity/
@@ -65,7 +77,7 @@ def check_wifi():
             connect_to_wifi()
         print("Reconnected to the wifi")
         print('Ip: ' + wlan.ifconfig()[0])
-        print('Mac: ' + mac = ubinascii.hexlify(network.WLAN().config('mac'), ':').decode())
+        print('Mac: ' + ubinascii.hexlify(network.WLAN().config('mac'), ':').decode())
         led.off()
     else:
         print( 'Ip = ' + wlan.ifconfig()[0] )
@@ -84,7 +96,7 @@ while True:
     check_wifi()
     
     try:
-        data = readSensor()
+        tempHumidData = readTempHumidSensor()
 
         display.sleep(False)
         display.fill(0)
@@ -108,9 +120,10 @@ while True:
         request = cl.recv(1024)
         
         try:
-            data = readSensor()
+            temp_humid_data = readTempHumidSensor()
+            ccs811_data = readCCS811()
             cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n")
-            cl.send("{\"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s}" % (data[0], data[1], data[2]))
+            cl.send("{\"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s, \"eco2\":%s, \"tvoc\":%s}" % (temp_humid_data[0], temp_humid_data[1], temp_humid_data[2], ccs811_data[0], ccs811_data[1]))
     
         except:
             cl.send("HTTP/1.0 500 Internal Server Error\r\nContent-type: application/json\r\n\r\n")
@@ -124,5 +137,3 @@ while True:
             print('connection closed')
         except:
             pass
-        
-
