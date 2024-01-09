@@ -6,7 +6,7 @@ This is a micropython script for the raspberry pi pico w in use with a HDC1080 s
 
 ## How to use
 
-1. Upload [my HDC1080 library](https://github.com/SturmEnte/hdc1080-raspberry-pi-pico) to the pico.
+1. Upload [my HDC1080 library](https://github.com/SturmEnte/hdc1080-raspberry-pi-pico) and [the library for the CSS811](https://github.com/Notthemarsian/CCS811/blob/master/CCS811.py) to the pico.
 2. Upload a Python file called "secrets.py" with a variable called "SSID" containing the wifi's ssid and a variable called "PASSWORD" containing the wifi's password. You can also create a variable called "TEMP_CORRECTION". The integer you put in this variable will be added to the raw temperatur to get the corrected temperature.
 3. Upload main.py from this repository to the pico.
 
