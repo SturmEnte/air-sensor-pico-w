@@ -44,8 +44,6 @@ def readCCS811():
         print("Waiting for ccs811 sensor data...")
     return (ccs811_sensor.eCO2, ccs811_sensor.tVOC)
 
-print(readCCS811())
-
 # This formula is not 100% correct because it is not using the air pressure
 # https://carnotcycle.wordpress.com/2012/08/04/how-to-convert-relative-humidity-to-absolute-humidity/
 def absolute_from_relative_humidity(temp, rel_humid):
