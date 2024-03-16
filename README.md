@@ -4,7 +4,7 @@
 
 This is a micropython script for the raspberry pi pico w in use with a HDC1080 sensor. If you send a http request to the raspberry pi pico will you receive the current temperature and humidity read by the sensor.
 
-# UI
+## UI
 
 I also made a website ui you can use for this project that you can find [here](https://github.com/SturmEnte/air-sensor-ui)
 
