@@ -28,7 +28,9 @@ print(i2c.scan())
 
 temp_humid_sensor = HDC1080(i2c)
 ccs811_sensor = CCS811.CCS811(i2c=i2c, addr=90)
-#display = sh1106.SH1106_I2C(128, 64, i2c, machine.Pin(2), 0x3c)
+
+# There is some weird error with the display so i deactivated it temporarily
+#display = sh1106.SH1106_I2C(128, 64, i2c, addr=0x3C)
 
 def readTempHumidSensor():
     data = temp_humid_sensor.readSensor()
@@ -96,17 +98,17 @@ while True:
     try:
         tempHumidData = readTempHumidSensor()
 
-        display.sleep(False)
-        display.fill(0)
+        #display.sleep(False)
+        #display.fill(0)
 
-        display.text(str(round(data[0], 2)), 0, 0, 1)
-        display.text('C', 50, 0, 1)
-        display.text(str(round(data[1], 2)), 0, 10, 1)
-        display.text('%', 50, 10, 1)
-        display.text(str(round(data[2], 2)), 0, 20, 1)
-        display.text('g/m3', 50, 20, 1)
-        display.text(wlan.ifconfig()[0], 0, 55, 1)
-        display.show()
+        #display.text(str(round(data[0], 2)), 0, 0, 1)
+        #display.text('C', 50, 0, 1)
+        #display.text(str(round(data[1], 2)), 0, 10, 1)
+        #display.text('%', 50, 10, 1)
+        #display.text(str(round(data[2], 2)), 0, 20, 1)
+        #display.text('g/m3', 50, 20, 1)
+        #display.text(wlan.ifconfig()[0], 0, 55, 1)
+        #display.show()
         
     except:
         print("Failed to read data or to display it on the screen")
