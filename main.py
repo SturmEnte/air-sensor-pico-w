@@ -122,7 +122,7 @@ while True:
         try:
             temp_humid_data = readTempHumidSensor()
             ccs811_data = readCCS811()
-            cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n")
+            cl.send("HTTP/1.0 200 OK\r\nContent-type: application/json\r\nAccess-Control-Allow-Origin: *\r\n\r\n")
             cl.send("{\"temperature\":%s, \"relative_humidity\":%s, \"absolute_humidity\":%s, \"eco2\":%s, \"tvoc\":%s}" % (temp_humid_data[0], temp_humid_data[1], temp_humid_data[2], ccs811_data[0], ccs811_data[1]))
     
         except:
